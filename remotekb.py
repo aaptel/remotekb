@@ -90,7 +90,7 @@ def start_client():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.KEYDOWN:
-                print("send kd" event.key)
+                print("send kd",event.key)
                 sock.key_down(event.key)
             elif event.type == pygame.KEYUP:
                 print("send ku", event.key)

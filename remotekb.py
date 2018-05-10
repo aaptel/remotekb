@@ -9,14 +9,22 @@ import argparse
 from pprint import pprint as P
 import time
 import pygame
-
+import socket
 
 HOST, PORT = "localhost", 9999
 
 def main():
     ap = argparse.ArgumentParser(description="remote kb")
     ap.add_argument("-s", "--server", action="store_true", help="start server")
+    ap.add_argument("-a", "--address", help="host:port to connect to")
     args = ap.parse_args()
+
+    if args.address:
+        a = args.address.split(":")
+        global HOST
+        HOST = a[0]
+        PORT = int(a[1])
+
     if args.server:
         start_server()
     else:
@@ -32,7 +40,7 @@ def key_up(k):
 
 class RemoteKbHandler(socketserver.BaseRequestHandler):
     def handle(self):
-        print("{} connected".format(self.client_address[0]))
+        print("recvd from {} ".format(self.client_address[0]))
         data = self.request[0].strip().decode('utf-8')
         if data[0] == 'd':
             key_down(data[1])
@@ -43,18 +51,18 @@ class RemoteKbHandler(socketserver.BaseRequestHandler):
 
 
 class ClientSock:
-    def __init__(h, p):
+    def __init__(self, h, p):
         self.host = h
         self.port = p
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-    def send(s):
+    def send(self, s):
         self.sock.sendto(bytes(s, "utf-8"), (self.host, self.port))
 
-    def key_up(k):
+    def key_up(self, k):
         self.send("u"+chr(k))
 
-    def key_down(k):
+    def key_down(self, k):
         self.send("d"+chr(k))
 
 
@@ -82,10 +90,10 @@ def start_client():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.KEYDOWN:
-                print("send kd %d", even.key)
+                print("send kd" event.key)
                 sock.key_down(event.key)
             elif event.type == pygame.KEYUP:
-                print("send ku %d", even.key)
+                print("send ku", event.key)
                 sock.key_up(event.key)
 
 if __name__ == '__main__':

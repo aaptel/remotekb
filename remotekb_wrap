@@ -47,6 +47,6 @@ if (!-e $injectlib) {
 # TODO call ldd on prog to guess sdl lib?
 
 $ENV{'REMOTEKB_PORT'} = $port;
-$ENV{'REMOTEKB_LIBSDL_PATH'} = "libSDL2-2.0.so.0";
+$ENV{'REMOTEKB_LIBSDL_PATH'} = $sdlpath;
 $ENV{'LD_PRELOAD'} = $injectlib;
 return system @ARGV;
